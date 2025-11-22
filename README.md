@@ -28,8 +28,21 @@ docker build -t mas-analyze:v1 ./agent_analyze
 docker build -t mas-final:v1 ./agent_final
 docker build -t mas-orchestrator:v1 ./orchestrator
 
+kubectl delete job orchestrator-job
+
+kubectl get pods
+
+kubectl apply -f k8s/
 
 
+kubectl get pods
+
+kubectl logs -f orchestrator-job-g2xzx
+
+PS C:\Users\dani2\Desktop\tesi-mas-k8s> git add .
+PS C:\Users\dani2\Desktop\tesi-mas-k8s> git commit -m "Aggiornamento codice e readme"
+
+PS C:\Users\dani2\Desktop\tesi-mas-k8s> git push
 
 
 
