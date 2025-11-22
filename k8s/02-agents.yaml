@@ -1,0 +1,140 @@
+# --- E1 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-e1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-e1
+  template:
+    metadata:
+      labels:
+        app: agent-e1
+    spec:
+      containers:
+      - name: agent-e1
+        image: mas-e1:v1
+        imagePullPolicy: Never # Usa immagine locale
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-e1-service
+spec:
+  selector:
+    app: agent-e1
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+# --- E2 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-e2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-e2
+  template:
+    metadata:
+      labels:
+        app: agent-e2
+    spec:
+      containers:
+      - name: agent-e2
+        image: mas-e2:v1
+        imagePullPolicy: Never
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-e2-service
+spec:
+  selector:
+    app: agent-e2
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+# --- ANALYZE (Quello da Scalare) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-analyze
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-analyze
+  template:
+    metadata:
+      labels:
+        app: agent-analyze
+    spec:
+      containers:
+      - name: agent-analyze
+        image: mas-analyze:v1
+        imagePullPolicy: Never
+        resources: # IMPORTANTE PER HPA
+          requests:
+            cpu: "100m" # 0.1 CPU
+          limits:
+            cpu: "500m" # 0.5 CPU
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-analyze-service
+spec:
+  selector:
+    app: agent-analyze
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+# --- FINAL ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-final
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-final
+  template:
+    metadata:
+      labels:
+        app: agent-final
+    spec:
+      containers:
+      - name: agent-final
+        image: mas-final:v1
+        imagePullPolicy: Never
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-final-service
+spec:
+  selector:
+    app: agent-final
+  ports:
+    - port: 8000
+      targetPort: 8000

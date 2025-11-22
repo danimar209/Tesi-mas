@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: orchestrator-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: orchestrator
+        image: mas-orchestrator:v1
+        imagePullPolicy: Never
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434"
+      restartPolicy: Never
+  backoffLimit: 1
