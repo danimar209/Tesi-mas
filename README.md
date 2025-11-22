@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Sistema Multi-Agente su Kubernetes (MAS-K8s)
 Questo progetto implementa un sistema multi-agente per l'analisi scientifica utilizzando Kubernetes. Il sistema è composto da 4 agenti specializzati, un orchestrator (Job) e un servizio LLM locale (Ollama).
 
@@ -80,3 +81,6 @@ Spegnere tutto e pulire: Se vuoi fermare il sistema e rimuovere tutto da Kuberne
 PowerShell
 
 kubectl delete -f k8s/
+=======
+
+>>>>>>> 5331396d86b8373a4119c8c5656a7d9f9e5ae1c1
