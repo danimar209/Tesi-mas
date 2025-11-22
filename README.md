@@ -1,25 +1,25 @@
-# Sistema Multi-Agente su Kubernetes (MAS-K8s)
+# Sistema Multi-Agente su Kubernetes 
 
-Questo progetto implementa un sistema multi-agente per l’analisi scientifica utilizzando Kubernetes.
+Questo progetto implementa un sistema multi-agente utilizzando Kubernetes.
 
 **Il sistema è composto da:**
 * **4 Agenti specializzati**
-* Un **Orchestrator** (Job Kubernetes)
+* Un **Orchestrator** 
 * Un servizio **LLM locale** basato su Ollama
 
-## 📋 Prerequisiti
+## Prerequisiti
 
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (con Kubernetes abilitato nelle impostazioni)
+* [Docker Desktop] con Kubernetes abilitato nelle impostazioni
 * PowerShell o un terminale equivalente
 
 ---
 
-## 🚀 1. Prima Esecuzione Assoluta (Setup)
+## 1. Prima Esecuzione (Setup)
 
-Questi passaggi vanno eseguiti solo la prima volta, oppure quando modifichi il codice sorgente degli agenti e devi ricostruire le immagini Docker.
+Questi passaggi vanno eseguiti solo la prima volta, oppure quando viene modificato il codice sorgente degli agenti e si devono ricostruire le immagini Docker.
 
 ### A. Build delle Immagini Docker
-Costruisci le immagini locali per ogni componente eseguendo questi comandi nella root del progetto:
+Costruire le immagini locali per ogni componente eseguendo questi comandi nella root del progetto:
 
 ```bash
 docker build -t mas-e1:v1 ./agent_e1
@@ -28,21 +28,24 @@ docker build -t mas-analyze:v1 ./agent_analyze
 docker build -t mas-final:v1 ./agent_final
 docker build -t mas-orchestrator:v1 ./orchestrator
 
-kubectl delete job orchestrator-job
+``` 
+### B. Esecuzione e Monitoraggio
+Una volta costruite le immagini, esegui i seguenti comandi per avviare il sistema su Kubernetes:
 
-kubectl get pods
+```bash
+# 1. Pulisci eventuali esecuzioni precedenti (se presenti)
+kubectl delete job orchestrator-job --ignore-not-found
 
+# 2. Avvia i servizi e l'orchestrator
 kubectl apply -f k8s/
 
-
+# 3. Verifica che i Pod siano stati creati e siano in stato 'Running' o 'Completed'
 kubectl get pods
 
-kubectl logs -f orchestrator-job-g2xzx
+# 4. Leggi i log dell'Orchestrator in tempo reale
+# Nota: usa 'jobs/orchestrator-job' per non dover cercare il nome casuale del pod
+kubectl logs -f jobs/orchestrator-job
 
-PS C:\Users\dani2\Desktop\tesi-mas-k8s> git add .
-PS C:\Users\dani2\Desktop\tesi-mas-k8s> git commit -m "Aggiornamento codice e readme"
-
-PS C:\Users\dani2\Desktop\tesi-mas-k8s> git push
 
 
 
