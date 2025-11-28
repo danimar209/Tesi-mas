@@ -7,6 +7,15 @@ Questo progetto implementa un sistema multi-agente utilizzando Kubernetes.
 * Un **Orchestrator** 
 * Un servizio **LLM locale** basato su Ollama
 
+## Struttura del Progetto
+
+* `agent_e1` / `agent_e2`: Agenti operativi per la raccolta/generazione dei dati iniziali.
+* `agent_analyze`: Agente dedicato all'aggregazione e analisi dei risultati.
+* `agent_final`: Agente per la sintesi finale e la generazione del report.
+* `orchestrator`: Il componente di controllo (Job) che gestisce la sequenza di esecuzione.
+* `k8s`: Manifesti Kubernetes per il deployment dei servizi.
+
+
 ## Prerequisiti
 
 * [Docker Desktop] con Kubernetes abilitato nelle impostazioni
