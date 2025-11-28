@@ -1,11 +1,11 @@
 # Sistema Multi-Agente su Kubernetes 
 
-Questo progetto implementa un sistema multi-agente utilizzando Kubernetes.
+Questo progetto implementa un sistema multi-agente utilizzando Kubernetes, LangGraph, Docker, Ollama.
 
 **Il sistema è composto da:**
-* **4 Agenti specializzati**
-* Un **Orchestrator** 
-* Un servizio **LLM locale** basato su Ollama
+* **4 Agenti specializzati** incapsulati in 4 container Docker diversi.
+* Un **Orchestrator** implementato con LangGraph.
+* Un servizio **LLM locale** basato su Ollama.
 
 ## Struttura del Progetto
 

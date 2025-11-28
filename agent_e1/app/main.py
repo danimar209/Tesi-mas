@@ -28,6 +28,7 @@ def invoke_agent(data: TaskInput):
         Formula: Delta E ≈ hbar / Delta t
         Fornisci SOLO il calcolo e il risultato numerico in eV. Sii conciso."""
     )
+    
     chain = prompt | llm | StrOutputParser()
     result = chain.invoke({"task": data.task})
     return {"output": result}

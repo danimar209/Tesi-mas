@@ -17,6 +17,7 @@ llm = ChatOllama(
     temperature=0.0
 )
 
+
 @app.post("/invoke", response_model=AgentOutput)
 def invoke_agent(data: TaskInput):
     print("Agente E2: Ricevuta richiesta...")

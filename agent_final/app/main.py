@@ -28,6 +28,7 @@ def invoke_agent(data: FinalInput):
         Qual è la risposta finale corretta tra le scelte (A), (B), (C), (D)?
         Rispondi solo con la lettera e il valore (es. (X) 10^-Y eV)."""
     )
+    
     chain = prompt | llm | StrOutputParser()
     result = chain.invoke({"analysis": data.analysis})
     return {"output": result}

@@ -123,6 +123,7 @@ if __name__ == "__main__":
     
     res = app.invoke({"task": TASK, "analysis_attempts": 0, "max_attempts": 2})
     
+    
     end_time = time.time()
     print(f"--- FINE. Tempo totale: {end_time - start_time:.2f}s ---", flush=True)
     print(f"Risultato: {res['final_answer']}", flush=True)

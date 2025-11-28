@@ -37,6 +37,7 @@ def invoke_agent(data: AnalysisInput):
         4. Scegli l'unica opzione che è *significativamente maggiore* dell'incertezza dominante. Motiva la scelta.
         """
     )
+    
     chain = prompt | llm | StrOutputParser()
     result = chain.invoke({
         "task": data.task,
