@@ -82,7 +82,7 @@ def pull_model():
     print("Richiesta download modello...", flush=True)
     try:
         requests.post(f"{OLLAMA_URL}/api/pull", json={"name": "llama3"})
-        # In produzione useremmo lo stream, qui semplifichiamo aspettando
+        # Useremmo lo stream, qui semplifichiamo aspettando
         time.sleep(10) 
     except: pass
 
