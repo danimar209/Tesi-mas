@@ -1,6 +1,6 @@
 # Sistema Multi-Agente su Kubernetes 
 
-Questo progetto implementa un sistema multi-agente utilizzando Kubernetes, RabbitMQ, LangGraph, Docker, Ollama.
+Questo progetto implementa un sistema multi-agente utilizzando **Kubernetes, RabbitMQ, LangGraph, Docker, Ollama.**
 
 **Il sistema è composto da:**
 * **RabbitMQ:** gestisce le code e garantisce la persistenza dei task.
