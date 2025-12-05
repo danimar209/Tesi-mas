@@ -1,8 +1,10 @@
-# --- E1 ---
+# --- E1 (Consumer) ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agent-e1
+  labels:
+    app: agent-e1
 spec:
   replicas: 1
   selector:
@@ -16,27 +18,18 @@ spec:
       containers:
       - name: agent-e1
         image: mas-e1:v1
-        imagePullPolicy: Never # Usa immagine locale
+        imagePullPolicy: Never
         env:
         - name: OLLAMA_BASE_URL
           value: "http://ollama-service:11434"
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: agent-e1-service
-spec:
-  selector:
-    app: agent-e1
-  ports:
-    - port: 8000
-      targetPort: 8000
----
-# --- E2 ---
+# --- E2 (Consumer) ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agent-e2
+  labels:
+    app: agent-e2
 spec:
   replicas: 1
   selector:
@@ -55,22 +48,13 @@ spec:
         - name: OLLAMA_BASE_URL
           value: "http://ollama-service:11434"
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: agent-e2-service
-spec:
-  selector:
-    app: agent-e2
-  ports:
-    - port: 8000
-      targetPort: 8000
----
-# --- ANALYZE (Quello da Scalare) ---
+# --- ANALYZE (Consumer con Scaling) ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agent-analyze
+  labels:
+    app: agent-analyze
 spec:
   replicas: 1
   selector:
@@ -85,31 +69,22 @@ spec:
       - name: agent-analyze
         image: mas-analyze:v1
         imagePullPolicy: Never
-        resources: # IMPORTANTE PER HPA
+        resources: # Manteniamo le risorse per l'HPA
           requests:
-            cpu: "100m" # 0.1 CPU
+            cpu: "100m"
           limits:
-            cpu: "500m" # 0.5 CPU
+            cpu: "500m"
         env:
         - name: OLLAMA_BASE_URL
           value: "http://ollama-service:11434"
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: agent-analyze-service
-spec:
-  selector:
-    app: agent-analyze
-  ports:
-    - port: 8000
-      targetPort: 8000
----
-# --- FINAL ---
+# --- FINAL (Consumer) ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: agent-final
+  labels:
+    app: agent-final
 spec:
   replicas: 1
   selector:
@@ -127,14 +102,3 @@ spec:
         env:
         - name: OLLAMA_BASE_URL
           value: "http://ollama-service:11434"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: agent-final-service
-spec:
-  selector:
-    app: agent-final
-  ports:
-    - port: 8000
-      targetPort: 8000

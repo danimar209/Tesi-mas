@@ -1,34 +1,72 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+import pika
+import json
+import os
+import time
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-import os
 
-class TaskInput(BaseModel):
-    task: str
-class AgentOutput(BaseModel):
-    output: str
+# --- CONFIGURAZIONE AGENTE E2 ---
+QUEUE_NAME = 'queue_e2'
 
-app = FastAPI()
+PROMPT_TEMPLATE = """Task: {task}
+Sub-task: Calcola l'incertezza energetica (Delta E) per il secondo stato.
+Lifetime (Delta t) = 10^-8 sec.
+Usa hbar ≈ 6.582 x 10^-16 eV*s.
+Formula: Delta E ≈ hbar / Delta t
+Fornisci SOLO il calcolo e il risultato numerico in eV. Sii conciso."""
+
+# --- CONFIGURAZIONE COMUNE ---
+RABBITMQ_HOST = 'rabbitmq-service'
+RABBITMQ_USER = 'user'
+RABBITMQ_PASS = 'password'
+
 llm = ChatOllama(
-    model="llama3", # NOTA: Usiamo llama3
+    model="llama3",
     base_url=os.environ.get("OLLAMA_BASE_URL"),
     temperature=0.0
 )
 
-
-@app.post("/invoke", response_model=AgentOutput)
-def invoke_agent(data: TaskInput):
-    print("Agente E2: Ricevuta richiesta...")
-    prompt = ChatPromptTemplate.from_template(
-        """Task: {task}
-        Sub-task: Calcola l'incertezza energetica (Delta E) per il secondo stato.
-        Lifetime (Delta t) = 10^-8 sec.
-        Usa hbar ≈ 6.582 x 10^-16 eV*s.
-        Formula: Delta E ≈ hbar / Delta t
-        Fornisci SOLO il calcolo e il risultato numerico in eV. Sii conciso."""
-    )
+def process_message(ch, method, props, body):
+    print(f" [x] Ricevuto messaggio: {body}", flush=True)
+    data = json.loads(body)
+    
+    prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     chain = prompt | llm | StrOutputParser()
-    result = chain.invoke({"task": data.task})
-    return {"output": result}
+    
+    try:
+        result = chain.invoke(data)
+    except Exception as e:
+        result = f"Error: {e}"
+
+    response = {"output": result}
+
+    ch.basic_publish(exchange='',
+                     routing_key=props.reply_to,
+                     properties=pika.BasicProperties(correlation_id=props.correlation_id),
+                     body=json.dumps(response))
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+    print(" [x] Risposta inviata", flush=True)
+
+def main():
+    print(f"Agente {QUEUE_NAME} avviato. Connessione a RabbitMQ...", flush=True)
+    credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
+    
+    while True:
+        try:
+            connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, credentials=credentials))
+            channel = connection.channel()
+            break
+        except Exception:
+            print("RabbitMQ non pronto, riprovo tra 5s...", flush=True)
+            time.sleep(5)
+
+    channel.queue_declare(queue=QUEUE_NAME)
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(queue=QUEUE_NAME, on_message_callback=process_message)
+
+    print(f" [*] In attesa su coda '{QUEUE_NAME}'", flush=True)
+    channel.start_consuming()
+
+if __name__ == "__main__":
+    main()

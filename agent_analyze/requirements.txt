@@ -1,6 +1,6 @@
-fastapi
-uvicorn[standard]
+pika
+langgraph
+langchain
 langchain-community
-langchain-core
 langchain-ollama
-pydantic
+requests
